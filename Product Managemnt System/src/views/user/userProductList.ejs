@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Product List</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background-color: #333;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .header-links {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .header-links a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+      }
+
+      .header-links a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 50px auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      .product-list {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .product-list li {
+        background-color: #f9f9f9;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .product-list li button {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .product-list li button:hover {
+        background-color: #c0392b;
+      }
+
+      .add-product {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .add-product input {
+        padding: 10px;
+        width: 60%;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .add-product button {
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .add-product button:hover {
+        background-color: #2980b9;
+      }
+
+      .message {
+        text-align: center;
+        margin-top: 20px;
+        color: green;
+      }
+
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      const role = localStorage.getItem("role");
+      const dashboardUrl = role === "admin" ? "/admin/dashboard" : "/user/dashboard";
+
+      function setDashboardLink() {
+        const dashboardLink = document.getElementById("dashboard-link");
+        if (dashboardLink) {
+          dashboardLink.href = dashboardUrl;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", setDashboardLink);
+    </script>
+
+    <header>
+      <h1>My Product List</h1>
+      <div class="header-links">
+        <a href="#" id="dashboard-link">Dashboard</a>
+        <a href="#" id="logout">Logout</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <ul class="product-list" id="product-list">
+      </ul>
+
+      <div class="add-product">
+        <input type="text" id="product-id" placeholder="Enter Product ID" />
+        <button onclick="addProduct()">Add Product</button>
+      </div>
+
+      <div class="message" id="message"></div>
+    </div>
+
+    <script>
+      document.getElementById("logout").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        window.location.href = "/login";
+      });
+
+      const api = {
+        getList: "/api/users/products/list",
+        add: "/api/users/products/list/add",
+        remove: "/api/users/products/list/remove",
+      };
+
+      const userId = localStorage.getItem("id");
+
+      function fetchProductList() {
+        fetch(`${api.getList}?userId=${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const productList = document.getElementById("product-list");
+            productList.innerHTML = "";
+
+            if (data.products && data.products.length > 0) {
+              data.products.forEach((product) => {
+                const li = document.createElement("li");
+                li.textContent = `Product ID: ${product.productId}`;
+
+                const removeButton = document.createElement("button");
+                removeButton.textContent = "Remove";
+                removeButton.onclick = () => removeProduct(product.productId);
+
+                li.appendChild(removeButton);
+                productList.appendChild(li);
+              });
+            } else {
+              productList.innerHTML = "<li>No products in your list.</li>";
+            }
+          })
+          .catch((err) => {
+            displayMessage("Error fetching product list", true);
+            console.log(err.message);
+          });
+      }
+
+      function addProduct() {
+        const productId = document.getElementById("product-id").value;
+
+        if (!productId) {
+          displayMessage("Please enter a product ID", true);
+          return;
+        }
+
+        fetch(api.add, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userId, productId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            displayMessage(data.message);
+            fetchProductList();
+          })
+          .catch((err) => {
+            displayMessage("Error adding product", true);
+            console.log(err);
+          });
+      }
+
+      function removeProduct(productId) {
+        fetch(api.remove, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userId, productId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            displayMessage(data.message);
+            fetchProductList();
+          })
+          .catch((err) => displayMessage("Error removing product", true));
+      }
+
+      function displayMessage(message, isError = false) {
+        const messageElement = document.getElementById("message");
+        messageElement.textContent = message;
+        messageElement.className = isError ? "error" : "";
+      }
+
+      fetchProductList();
+    </script>
+  </body>
+</html>

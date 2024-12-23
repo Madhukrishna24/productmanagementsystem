@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <title>Audit Trail</title>
+  </head>
+  <body>
+    <header>
+      <h1>Audit Trail</h1>
+      <nav>
+        <a href="/admin/dashboard">Dashboard</a>
+        <a href="#" id="logout">Logout</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="audit-trail-cards" id="auditTrailCards">
+        <p id="noEntriesMessage" style="display: none;">No audit trail entries found.</p>
+      </section>
+    </main>
+
+    <script>
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      fetch("/api/admin/audit-trails", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              window.location.href = "/login";
+            } else {
+              return response.text().then((text) => {
+                throw new Error(
+                  `HTTP error! status: ${response.status}, message: ${text}`
+                );
+              });
+            }
+          }
+          const contentType = response.headers.get("Content-Type");
+          if (contentType && contentType.includes("application/json")) {
+            return response.json();
+          } else {
+            throw new Error("Expected JSON response");
+          }
+        })
+        .then((data) => {
+          const auditTrailCards = document.getElementById("auditTrailCards");
+          const noEntriesMessage = document.getElementById("noEntriesMessage");
+
+          if (data.length === 0) {
+            noEntriesMessage.style.display = "block";
+            return;
+          }
+
+          data.forEach((entry) => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h3>${entry.action}</h3>
+              <p>User Id: ${entry.userId}</p>
+              <p>Date: ${new Date(entry.created_at).toLocaleString()}</p>
+              <p>Description: ${entry.description || 'No description provided.'}</p>
+            `;
+            auditTrailCards.appendChild(card);
+          });
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          const auditTrailCards = document.getElementById("auditTrailCards");
+          auditTrailCards.innerHTML = `<p>Error loading audit trail entries. Please try again later.</p>`;
+        });
+
+      document.getElementById("logout").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        window.location.href = "/login";
+      });
+    </script>
+  </body>
+</html>

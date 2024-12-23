@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      header {
+        background-color: #333;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header h1 {
+        margin: 0;
+      }
+
+      nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+      }
+
+      nav ul li {
+        margin-left: 15px;
+      }
+
+      nav ul li button {
+        color: white;
+        text-decoration: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font: inherit;
+        padding: 0;
+      }
+
+      main {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      .welcome h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .welcome p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+      }
+
+      .dashboard-sections {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: space-around;
+      }
+
+      .dashboard-section {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 30%;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .dashboard-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .dashboard-section h3 {
+        margin-bottom: 0.5rem;
+        color: #007bff;
+        font-size: 1.5rem;
+      }
+
+      .dashboard-section p {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-section {
+          width: 100%;
+        }
+      }
+    </style>
+    <title>Admin Dashboard</title>
+  </head>
+  <body>
+    <header>
+      <h1>Admin Dashboard</h1>
+      <nav>
+        <ul>
+          <li><button onclick="logout()">Logout</button></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="welcome">
+        <h2>Welcome, Admin!</h2>
+      </section>
+
+      <section class="dashboard-sections">
+        <div class="dashboard-section">
+          <h3>User Management</h3>
+          <p>Manage user accounts by creating, updating, or deleting users.</p>
+          <button onclick="window.location.href='/manage-users'">
+            Go to User Management
+          </button>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Product Overview</h3>
+          <p>
+            View and manage the product inventory, including available stock and
+            pending requests.
+          </p>
+          <button onclick="window.location.href='/products-overview'">
+            Go to Product Overview
+          </button>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Create Product</h3>
+          <p>Add new products to the inventory.</p>
+          <button onclick="window.location.href='/create-product'">
+            Go to Create Product
+          </button>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Audit Trail</h3>
+          <p>
+            Track who added products to the inventory and monitor changes made
+            to the system.
+          </p>
+          <button onclick="window.location.href='/audit-trail'">
+            Go to Audit Trail
+          </button>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Admin Notifications</h3>
+          <p>View all notifications sent to the admin.</p>
+          <button onclick="window.location.href='/admin/notifications'">
+            Go to Notifications
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) window.location.href = "/login";
+
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+    </script>
+  </body>
+</html>

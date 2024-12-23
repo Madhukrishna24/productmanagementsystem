@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+
+      header {
+        background-color: #333;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header h1 {
+        margin: 0;
+      }
+
+      nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 15px;
+      }
+
+      nav ul li {
+        display: inline;
+      }
+
+      nav ul li button {
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font: inherit;
+        padding: 0;
+      }
+
+      main {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      .welcome h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .welcome p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+      }
+
+      .dashboard-sections {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: space-around;
+      }
+
+      .dashboard-section {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 30%;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .dashboard-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .dashboard-section h3 {
+        margin-bottom: 0.5rem;
+        color: #007bff;
+        font-size: 1.5rem;
+      }
+
+      .dashboard-section p {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-section {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>User Dashboard</h1>
+      <nav>
+        <ul>
+          <li><button onclick="logout()">Logout</button></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="welcome">
+        <h2>Welcome to Your Dashboard!</h2>
+        <p>Use the tools below to manage your personal bookshelf and request products.</p>
+      </section>
+
+      <section class="dashboard-sections">
+        <div class="dashboard-section">
+          <h3>My Product List</h3>
+          <p>View and manage your personal product list.</p>
+          <button onclick="window.location.href='/my-product-list'">Go to My Product List</button>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Product Requests</h3>
+          <p>Request products from the inventory.</p>
+          <button onclick="window.location.href='/product-request'">Request Product</button>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>All Products</h3>
+          <p>View all available products in the inventory.</p>
+          <button onclick="window.location.href='/all-products'">View All Products</button>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      function logout() {
+        localStorage.removeItem("token"); // Remove the token from localStorage
+        window.location.href = "/login"; // Redirect to the login page
+      }
+    </script>
+  </body>
+</html>
